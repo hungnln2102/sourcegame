@@ -1,0 +1,35 @@
+# Python ignores
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# Heavy Game Assets & Archives
+*.apk
+*.xapk
+*.zip
+*.rar
+*.7z
+*.tar.gz
+*.bin
+
+# Extracted & Exported Asset folders
+exported_assets_full/
+exported_assets/
+decompiled_src/
+extracted_xapk/
+extracted_lang/
+extracted_equipment/
+temp_*/
+
+# Web Tool heavy folders
+web_tool/uploads/
+web_tool/outputs/
+
+# OS generated files
+.DS_Store
+Thumbs.db

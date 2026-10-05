@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APK / XAPK Game Asset Extractor Studio</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-card: rgba(22, 28, 45, 0.75);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --accent-primary: #6366f1;
+            --accent-secondary: #ec4899;
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Glow Background */
+        .glow-sphere {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(236, 72, 153, 0.05) 50%, transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .glow-top-left { top: -100px; left: -100px; }
+        .glow-bottom-right { bottom: -100px; right: -100px; }
+
+        .container {
+            width: 100%;
+            max-width: 720px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            color: #818cf8;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .title {
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            background: linear-gradient(to right, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.75rem;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 2.25rem;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        /* Upload Area */
+        .dropzone {
+            border: 2px dashed rgba(99, 102, 241, 0.35);
+            border-radius: 16px;
+            padding: 3rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(15, 23, 42, 0.4);
+        }
+
+        .dropzone:hover, .dropzone.dragover {
+            border-color: #818cf8;
+            background: rgba(99, 102, 241, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .dropzone-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1.25rem;
+            background: rgba(99, 102, 241, 0.12);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #818cf8;
+        }
+
+        .dropzone-icon svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .dropzone-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .dropzone-desc {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Selected File Card */
+        .file-info {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-top: 1.25rem;
+        }
+
+        .file-details {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(236, 72, 153, 0.12);
+            color: #f472b6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .file-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .file-size {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Action Button */
+        .btn-action {
+            width: 100%;
+            margin-top: 1.5rem;
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 14px;
+            background: var(--accent-gradient);
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-action:hover:not(:disabled) {
+            opacity: 0.95;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.6);
+        }
+
+        .btn-action:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Progress Area */
+        .progress-section {
+            display: none;
+            margin-top: 1.5rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 9999px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent-gradient);
+            border-radius: 9999px;
+            transition: width 0.3s ease;
+        }
+
+        .status-message {
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* Success Download Card */
+        .success-card {
+            display: none;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .success-title {
+            color: var(--success);
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 1rem 0 1.25rem;
+        }
+
+        .stat-item {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 0.75rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .btn-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.85rem 1.75rem;
+            background: var(--success);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px -5px rgba(16, 185, 129, 0.6);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="glow-sphere glow-top-left"></div>
+    <div class="glow-sphere glow-bottom-right"></div>
+
+    <div class="container">
+        <div class="header">
+            <div class="badge">⚡ Powered by Full Asset Engine</div>
+            <h1 class="title">APK & XAPK Asset Extractor</h1>
+            <p class="subtitle">Trích xuất và giải mã toàn bộ hình ảnh (ASTC/PNG), UI, âm thanh, Spine và bản đồ chỉ với 1 click.</p>
+        </div>
+
+        <div class="card">
+            <div class="dropzone" id="dropzone">
+                <div class="dropzone-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                </div>
+                <div class="dropzone-title">Kéo & thả file APK / XAPK vào đây</div>
+                <div class="dropzone-desc">Hoặc nhấp để chọn file từ máy tính (Hỗ trợ .apk, .xapk, .zip)</div>
+                <input type="file" id="fileInput" accept=".apk,.xapk,.zip">
+            </div>
+
+            <div class="file-info" id="fileInfo">
+                <div class="file-details">
+                    <div class="file-icon">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="file-name" id="fileName">Tên file</div>
+                        <div class="file-size" id="fileSize">0 MB</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-action" id="btnExtract" disabled>
+                <span>🚀 Bắt đầu Crawl & Trích Xuất Toàn Bộ</span>
+            </button>
+
+            <!-- Progress Section -->
+            <div class="progress-section" id="progressSection">
+                <div class="progress-header">
+                    <span id="progressPercent">0%</span>
+                    <span id="progressState">Đang xử lý...</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressBar"></div>
+                </div>
+                <div class="status-message" id="statusMessage">Hệ thống đang chuẩn bị giải nén...</div>
+            </div>
+
+            <!-- Success Card -->
+            <div class="success-card" id="successCard">
+                <div class="success-title">🎉 Trích xuất thành công 100%!</div>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">Toàn bộ tài nguyên đã được phân loại và giải mã sang PNG/MP3.</p>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="statFiles">0</div>
+                        <div class="stat-label">Tổng số files</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="statAstc">0</div>
+                        <div class="stat-label">Ảnh ASTC đã giải mã</div>
+                    </div>
+                </div>
+                <a href="#" class="btn-download" id="downloadLink" download>
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    <span>Tải về toàn bộ Assets (.ZIP)</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer">
+            Tool hỗ trợ Engine Cocos Creator, Unity Asset Mapping & Texture ASTC Decoder.
+        </div>
+    </div>
+
+    <script>
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const btnExtract = document.getElementById('btnExtract');
+        const progressSection = document.getElementById('progressSection');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercent = document.getElementById('progressPercent');
+        const statusMessage = document.getElementById('statusMessage');
+        const successCard = document.getElementById('successCard');
+        const statFiles = document.getElementById('statFiles');
+        const statAstc = document.getElementById('statAstc');
+        const downloadLink = document.getElementById('downloadLink');
+
+        let selectedFile = null;
+        let pollTimer = null;
+
+        dropzone.addEventListener('click', () => fileInput.click());
+
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+            fileInfo.style.display = 'flex';
+            btnExtract.disabled = false;
+            successCard.style.display = 'none';
+            progressSection.style.display = 'none';
+        }
+
+        btnExtract.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            btnExtract.disabled = true;
+            progressSection.style.display = 'block';
+            successCard.style.display = 'none';
+            progressBar.style.width = '5%';
+            progressPercent.textContent = '5%';
+            statusMessage.textContent = 'Đang tải file lên server...';
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Lỗi tải file lên server');
+                }
+
+                const data = await response.json();
+                startPolling(data.job_id);
+            } catch (err) {
+                statusMessage.textContent = 'Lỗi: ' + err.message;
+                btnExtract.disabled = false;
+            }
+        });
+
+        function startPolling(jobId) {
+            if (pollTimer) clearInterval(pollTimer);
+
+            pollTimer = setInterval(async () => {
+                try {
+                    const res = await fetch(`/api/status/${jobId}`);
+                    const job = await res.json();
+
+                    progressBar.style.width = job.percent + '%';
+                    progressPercent.textContent = job.percent + '%';
+                    statusMessage.textContent = job.status;
+
+                    if (job.state === 'completed') {
+                        clearInterval(pollTimer);
+                        progressSection.style.display = 'none';
+                        successCard.style.display = 'block';
+                        statFiles.textContent = job.total_files.toLocaleString();
+                        statAstc.textContent = job.decoded_astc.toLocaleString();
+                        downloadLink.href = `/download/${job.zip_file}`;
+                        btnExtract.disabled = false;
+                    } else if (job.state === 'failed') {
+                        clearInterval(pollTimer);
+                        statusMessage.textContent = 'Thất bại: ' + job.error;
+                        btnExtract.disabled = false;
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
