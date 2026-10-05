@@ -11,7 +11,7 @@ with zipfile.ZipFile(xapk_path) as xapk:
     pad_bytes = xapk.read('pad_install.apk')
 
 print("Extracting source maps from com.plantdefense.gp.apk...")
-os.makedirs('decompiled_src', exist_ok=True)
+os.makedirs('source/decompiled_src', exist_ok=True)
 with zipfile.ZipFile(io.BytesIO(main_apk_bytes)) as apk:
     map_data = apk.read('assets/assets/main/index.js.map')
     try:
@@ -22,12 +22,12 @@ with zipfile.ZipFile(io.BytesIO(main_apk_bytes)) as apk:
         for idx, src_path in enumerate(sources):
             # Clean path
             clean_path = src_path.replace('db://assets/', '').replace('../', '')
-            out_file = os.path.join('decompiled_src', clean_path)
+            out_file = os.path.join('source/decompiled_src', clean_path)
             os.makedirs(os.path.dirname(out_file), exist_ok=True)
             content = sources_content[idx] if idx < len(sources_content) and sources_content[idx] else ''
             with open(out_file, 'w', encoding='utf-8') as f:
                 f.write(content)
-        print("Source files extracted successfully into decompiled_src!")
+        print("Source files extracted successfully into source/decompiled_src!")
     except Exception as e:
         print(f"Error unpacking source map: {e}")
 
@@ -66,9 +66,9 @@ with zipfile.ZipFile(io.BytesIO(pad_bytes)) as apk:
             pass
 
 print(f"Found {len(equip_configs)} potential equipment JSON config files.")
-os.makedirs('extracted_equipment', exist_ok=True)
+os.makedirs('source/extracted_equipment', exist_ok=True)
 for idx, (path, size, data) in enumerate(equip_configs[:20]):
     out_name = f"equip_config_{idx}.json"
-    with open(os.path.join('extracted_equipment', out_name), 'w', encoding='utf-8') as f:
+    with open(os.path.join('source/extracted_equipment', out_name), 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
     print(f"Saved {out_name} (from {path}, {size} bytes)")

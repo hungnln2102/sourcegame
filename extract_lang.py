@@ -38,10 +38,10 @@ for name, path, length in all_text_assets:
     print(f" - {name} ({length} bytes) -> {path}")
 
 print(f"\nExtracted {len(localization_files)} matching localization files:")
-os.makedirs('extracted_lang', exist_ok=True)
+os.makedirs('source/extracted_lang', exist_ok=True)
 for name, (path, content) in localization_files.items():
     filename = name if any(name.endswith(ext) for ext in ['.xml', '.json', '.txt', '.csv', '.tsv', '.yaml']) else f"{name}.xml"
-    out_path = os.path.join('extracted_lang', filename)
+    out_path = os.path.join('source/extracted_lang', filename)
     with open(out_path, 'w', encoding='utf-8') as f:
         f.write(content)
     print(f"Saved: {out_path} ({len(content)} chars)")

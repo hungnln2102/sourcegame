@@ -7,7 +7,7 @@ import shutil
 # Files configuration
 original_xapk = 'Last+Green_+Tower+Defense_1.1.1_APKPure.xapk'
 modded_xapk = 'Last_Green_Tower_Defense_Modded.xapk'
-lang_folder = 'extracted_lang'
+lang_folder = os.path.join('source', 'extracted_lang')
 
 print(f"Reading original XAPK: {original_xapk}")
 with zipfile.ZipFile(original_xapk, 'r') as xapk:

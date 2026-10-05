@@ -17,13 +17,8 @@ venv/
 *.tar.gz
 *.bin
 
-# Extracted & Exported Asset folders
-exported_assets_full/
-exported_assets/
-decompiled_src/
-extracted_xapk/
-extracted_lang/
-extracted_equipment/
+# Extracted & Exported Asset folders (Parent folder: source/)
+source/
 temp_*/
 
 # Web Tool heavy folders

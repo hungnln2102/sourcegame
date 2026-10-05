@@ -10,7 +10,7 @@ with zipfile.ZipFile(xapk_path) as xapk:
     main_apk_bytes = xapk.read('com.plantdefense.gp.apk')
 
 print("Extracting source maps from com.plantdefense.gp.apk...")
-os.makedirs('decompiled_src', exist_ok=True)
+os.makedirs('source/decompiled_src', exist_ok=True)
 with zipfile.ZipFile(io.BytesIO(main_apk_bytes)) as apk:
     map_data = apk.read('assets/assets/main/index.js.map')
     sm = json.loads(map_data.decode('utf-8'))
@@ -26,11 +26,11 @@ with zipfile.ZipFile(io.BytesIO(main_apk_bytes)) as apk:
         clean_path = clean_path.replace(':', '_').replace('*', '_').replace('?', '_').replace('"', '_').replace('<', '_').replace('>', '_').replace('|', '_')
         clean_path = clean_path.replace('../', '').replace('..\\', '')
         
-        out_file = os.path.join('decompiled_src', clean_path)
+        out_file = os.path.join('source/decompiled_src', clean_path)
         os.makedirs(os.path.dirname(out_file), exist_ok=True)
         content = sources_content[idx] if idx < len(sources_content) and sources_content[idx] else ''
         with open(out_file, 'w', encoding='utf-8') as f:
             f.write(content)
         success_count += 1
-    print(f"Successfully wrote {success_count} source files into decompiled_src!")
+    print(f"Successfully wrote {success_count} source files into source/decompiled_src!")
 

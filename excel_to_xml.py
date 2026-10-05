@@ -7,7 +7,7 @@ import sys
 sys.stdout.reconfigure(encoding='utf-8')
 
 excel_path = 'lang_export.xlsx'
-out_folder = 'extracted_lang'
+out_folder = os.path.join('source', 'extracted_lang')
 
 if not os.path.exists(excel_path):
     print(f"Error: {excel_path} not found.")

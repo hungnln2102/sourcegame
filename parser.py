@@ -66,7 +66,7 @@ def parse_ts_dict(text):
                 pass
     return result
 
-files = glob.glob('decompiled_src/**/Language.autogen.*.ts', recursive=True)
+files = glob.glob('source/decompiled_src/**/Language.autogen.*.ts', recursive=True)
 all_data = {}
 langs = []
 

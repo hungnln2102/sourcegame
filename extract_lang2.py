@@ -8,7 +8,7 @@ xapk_path = 'Last+Green_+Tower+Defense_1.1.1_APKPure.xapk'
 with zipfile.ZipFile(xapk_path) as xapk:
     apk_bytes = xapk.read('pad_install.apk')
 
-os.makedirs('extracted_lang', exist_ok=True)
+os.makedirs('source/extracted_lang', exist_ok=True)
 
 with zipfile.ZipFile(io.BytesIO(apk_bytes)) as apk:
     json_files = [n for n in apk.namelist() if n.endswith('.json') and 'import' in n]
@@ -38,7 +38,7 @@ with zipfile.ZipFile(io.BytesIO(apk_bytes)) as apk:
                     xml_str = next((s for s in all_strings if s.startswith('<?xml')), None)
                     
                     if loc_name and xml_str:
-                        with open(f'extracted_lang/{loc_name}.xml', 'w', encoding='utf-8') as f:
+                        with open(f'source/extracted_lang/{loc_name}.xml', 'w', encoding='utf-8') as f:
                             f.write(xml_str)
                         print(f'Extracted {loc_name}.xml ({len(xml_str)} bytes)')
                     

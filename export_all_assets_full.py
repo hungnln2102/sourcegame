@@ -53,7 +53,7 @@ def decode_astc_to_png(data):
 
 def main():
     xapk_path = 'Last+Green_+Tower+Defense_1.1.1_APKPure.xapk'
-    out_dir = 'exported_assets_full'
+    out_dir = os.path.join('source', 'exported_assets_full')
     
     print(f"Bắt đầu giải nén TOÀN BỘ tài nguyên từ {xapk_path} vào thư mục {out_dir}/ ...")
     

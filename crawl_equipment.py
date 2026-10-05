@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 vi_dict = {}
 
 try:
-    tree_vi = ET.parse('extracted_lang/localization_vi.xml')
+    tree_vi = ET.parse('source/extracted_lang/localization_vi.xml')
     for elem in tree_vi.getroot().findall('string'):
         vi_dict[elem.attrib.get('name')] = elem.text or ''
 except Exception as e:
@@ -19,7 +19,7 @@ def resolve_text(text_val):
     return vi_dict.get(text_val, text_val)
 
 # 2. Find the largest config JSON
-files = glob.glob('extracted_equipment/*.json')
+files = glob.glob('source/extracted_equipment/*.json')
 target_file = max(files, key=os.path.getsize)
 
 with open(target_file, 'r', encoding='utf-8') as f:
